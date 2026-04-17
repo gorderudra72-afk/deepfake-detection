@@ -1,6 +1,17 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAiClient() {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is missing. Please configure it in the Secrets panel.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+}
 
 export interface AnalysisResult {
   score: number; // 0-100, where 100 is highly likely to be a deepfake
@@ -28,10 +39,11 @@ export async function analyzeMedia(base64Data: string, mimeType: string): Promis
     ${isVideo ? '6. Temporal artifacts (flickering, face-swapping jitters, motion blurring errors).\n7. Audio-visual sync anomalies.' : ''}
     
     Final Goal: Determine if this media is REAL (Authentic) or FAKE (Deepfake/Manipulated).
-    Provide your analysis in a structured JSON format.
+    Respond ONLY with a valid JSON object.
   `;
 
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [
@@ -84,10 +96,27 @@ export async function analyzeMedia(base64Data: string, mimeType: string): Promis
       }
     });
 
-    const result = JSON.parse(response.text || '{}');
-    return result as AnalysisResult;
-  } catch (error) {
+    const text = response.text || '';
+    // Extract the JSON block more robustly
+    let jsonStr = text;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[0];
+    }
+    
+    if (!jsonStr.trim()) {
+      throw new Error("The AI provided an empty analysis. This can happen with very large or complex files. Please try a smaller image/video.");
+    }
+    
+    try {
+      const result = JSON.parse(jsonStr);
+      return result as AnalysisResult;
+    } catch (parseError) {
+      console.error("JSON Parse Error. Raw text:", text);
+      throw new Error("The forensics engine returned an unreadable report format. Please try again.");
+    }
+  } catch (error: any) {
     console.error("Analysis failed:", error);
-    throw new Error("Failed to analyze media. Please try with a smaller file or a different format.");
+    throw new Error(error.message || "Failed to analyze media. Please try again.");
   }
 }

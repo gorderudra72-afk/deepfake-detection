@@ -27,14 +27,29 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const startAnalysis = useCallback(async (base64: string, mimeType: string) => {
+    setState('ANALYZING');
+    setError(null);
+    try {
+      console.log('Initiating forensic analysis...', { mimeType, size: base64.length });
+      const analysisResult = await analyzeMedia(base64, mimeType);
+      setResult(analysisResult);
+      setState('RESULT');
+    } catch (err: any) {
+      console.error('Forensic Engine Error:', err);
+      setError(err.message || 'Verification failed. Please check your connection and try again.');
+      setState('IDLE');
+    }
+  }, []);
+
   const handleFile = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-      setError('Supported formats: Images and Videos (MP4, WebM).');
+      setError('Unsupported format. Please upload an image or video.');
       return;
     }
 
-    if (file.size > 15 * 1024 * 1024) { // 15MB limit for prototype
-      setError('File too large. Please use a file smaller than 15MB.');
+    if (file.size > 20 * 1024 * 1024) { // Increase to 20MB for better video support
+      setError('File too large. Max size is 20MB.');
       return;
     }
 
@@ -42,23 +57,15 @@ export default function App() {
     setSelectedFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-      startAnalysis(reader.result as string, file.type);
+      const result = reader.result as string;
+      setPreviewUrl(result);
+      startAnalysis(result, file.type);
+    };
+    reader.onerror = () => {
+      setError('Failed to read file from local storage.');
     };
     reader.readAsDataURL(file);
-  }, []);
-
-  const startAnalysis = async (base64: string, mimeType: string) => {
-    setState('ANALYZING');
-    try {
-      const analysisResult = await analyzeMedia(base64, mimeType);
-      setResult(analysisResult);
-      setState('RESULT');
-    } catch (err: any) {
-      setError(err.message || 'Verification failed. Please try again.');
-      setState('IDLE');
-    }
-  };
+  }, [startAnalysis]);
 
   const reset = () => {
     setState('IDLE');
