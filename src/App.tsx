@@ -48,9 +48,13 @@ export default function App() {
       return;
     }
 
-    if (file.size > 20 * 1024 * 1024) { // Increase to 20MB for better video support
-      setError('File too large. Max size is 20MB.');
+    if (file.size > 1024 * 1024 * 1024) { // 1GB limit
+      setError('File too large. Max size allowed is 1GB.');
       return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+      console.warn('Large file detected. Processing may fail due to browser memory or API limits.');
     }
 
     setError(null);
@@ -148,7 +152,7 @@ export default function App() {
                       </div>
                       <div>
                         <h3 className="text-lg font-medium text-white">Upload Media for Analysis</h3>
-                        <p className="text-sm text-white/40 mt-1">Drag and drop images or videos to check for digital manipulation, AI generation, and synthetic artifacts.</p>
+                        <p className="text-sm text-white/40 mt-1">High-capacity portal for images and large videos (up to 1GB).</p>
                       </div>
                       <div className="mt-2 py-2 px-4 rounded-full bg-blue-500/10 border border-blue-500/20 text-[11px] font-mono text-blue-400 uppercase tracking-wider">
                         Select File to Start
@@ -213,7 +217,7 @@ export default function App() {
                       <motion.div 
                         initial={{ top: '-10%' }}
                         animate={{ top: '110%' }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                         className="absolute w-full h-0.5 bg-blue-400 shadow-[0_0_25px_4px_rgba(59,130,246,0.8)] z-20"
                       />
                       <div className="absolute inset-0 bg-blue-500/5 mix-blend-overlay" />
@@ -256,8 +260,8 @@ export default function App() {
                   </div>
                   <h4 className="text-sm font-semibold uppercase tracking-wider">Real-time Feed</h4>
                 </div>
-                <p className="text-xs text-sh-neutral-400 leading-relaxed text-white/40">
-                  Connect direct API feeds for stream monitoring. DeepScan detects video frame injection and localized pixel manipulation in under 500ms.
+                <p className="text-[10px] font-mono uppercase tracking-[1px] text-white/20 mt-4">
+                  Max File Size: 1GB | Supports: JPG, PNG, MP4, WebM
                 </p>
               </div>
             </div>
@@ -294,8 +298,8 @@ export default function App() {
                       <div className="w-full max-w-[200px] h-1 bg-white/5 rounded-full overflow-hidden mt-4">
                         <motion.div 
                            className="h-full bg-blue-500"
-                           animate={{ width: ["0%", "45%", "60%", "95%"] }}
-                           transition={{ duration: 15, times: [0, 0.2, 0.5, 1] }}
+                           animate={{ width: ["0%", "70%", "95%"] }}
+                           transition={{ duration: 4, times: [0, 0.4, 1], repeat: Infinity }}
                         />
                       </div>
                       <div className="mt-8 space-y-4 w-full">

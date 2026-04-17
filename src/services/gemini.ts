@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
 
 let aiInstance: GoogleGenAI | null = null;
 
@@ -39,7 +39,7 @@ export async function analyzeMedia(base64Data: string, mimeType: string): Promis
     ${isVideo ? '6. Temporal artifacts (flickering, face-swapping jitters, motion blurring errors).\n7. Audio-visual sync anomalies.' : ''}
     
     Final Goal: Determine if this media is REAL (Authentic) or FAKE (Deepfake/Manipulated).
-    Respond ONLY with a valid JSON object.
+    Respond ONLY with a valid JSON object. Be concise in your findings and explanation for high-speed reporting.
   `;
 
   try {
@@ -60,6 +60,7 @@ export async function analyzeMedia(base64Data: string, mimeType: string): Promis
         }
       ],
       config: {
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
