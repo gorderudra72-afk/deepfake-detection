@@ -97,10 +97,12 @@ export async function analyzeMedia(base64Data: string, mimeType: string): Promis
       }
     });
 
-    const text = response.text || '';
+    const text = (response as any).text;
+    const finalContent = typeof text === 'function' ? text() : text || '';
+    
     // Extract the JSON block more robustly
-    let jsonStr = text;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    let jsonStr = finalContent;
+    const jsonMatch = finalContent.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       jsonStr = jsonMatch[0];
     }

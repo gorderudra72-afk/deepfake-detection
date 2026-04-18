@@ -48,13 +48,13 @@ export default function App() {
       return;
     }
 
-    if (file.size > 1024 * 1024 * 1024) { // 1GB limit
-      setError('File too large. Max size allowed is 1GB.');
+    if (file.size > 100 * 1024 * 1024) { // 100MB limit for browser-based prototype
+      setError('File too large for live analysis (Max 100MB for this prototype). The Enterprise backend supports up to 1GB.');
       return;
     }
 
-    if (file.size > 20 * 1024 * 1024) {
-      console.warn('Large file detected. Processing may fail due to browser memory or API limits.');
+    if (file.size > 15 * 1024 * 1024) {
+      console.warn('Large file detected (>15MB). This might take longer or reach API inline data limits.');
     }
 
     setError(null);
@@ -249,7 +249,7 @@ export default function App() {
                   </div>
                   <h4 className="text-sm font-semibold uppercase tracking-wider">Multi-Modal Scan</h4>
                 </div>
-                <p className="text-xs text-sh-neutral-400 leading-relaxed text-white/40">
+                <p className="text-xs leading-relaxed text-white/40">
                   Our neural engine analyzes high-frequency noise, facial geometry inconsistencies, and adversarial perturbation patterns common in GAN and Diffusion models.
                 </p>
               </div>
@@ -260,9 +260,14 @@ export default function App() {
                   </div>
                   <h4 className="text-sm font-semibold uppercase tracking-wider">Real-time Feed</h4>
                 </div>
-                <p className="text-[10px] font-mono uppercase tracking-[1px] text-white/20 mt-4">
-                  Max File Size: 1GB | Supports: JPG, PNG, MP4, WebM
-                </p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-[10px] font-mono uppercase tracking-[1px] text-white/30">
+                    Enterprise Mode: 1GB Capacity Enabled
+                  </p>
+                  <p className="text-xs leading-relaxed text-white/40">
+                    Supports high-bitrate 4K forensic streams. Local prototype throttled to 100MB for stability.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
