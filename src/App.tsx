@@ -112,6 +112,7 @@ export default function App() {
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               SYSTEM_READY
             </div>
+            <div>Quota: UNLIMITED/DAY</div>
             <div>Uptime: 99.9%</div>
             <div>Nodes: 12 Active</div>
           </div>
@@ -438,7 +439,12 @@ export default function App() {
                     </div>
 
                     <div className="mt-8 pt-8 border-t border-white/5">
-                      <div className="text-[10px] font-mono text-white/30 uppercase mb-4 tracking-widest">System Capabilities</div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest">System Capabilities</div>
+                        <div className="text-[10px] font-mono text-green-400 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20 uppercase">
+                          UNLIMITED DAILY SCANS
+                        </div>
+                      </div>
                       <div className="grid grid-cols-2 gap-2">
                         {[
                           'Noise Analysis', 'Geometry Mapping', 'Pixel Diffusion', 
